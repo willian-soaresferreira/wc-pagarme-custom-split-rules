@@ -15,12 +15,16 @@
  * @param  array    $data  Transacion data.
  * @return array
  */
- function wc_pagarme_custom_split_rules( $data ) {	
-	// Dados do pedido
+ function wc_pagarme_custom_split_rules( $data ) {
+	// Ideia principal da função: receber os dados que serão enviados à API da Pagar.me ($data), 
+	// adicionar as split_rules, que é um array de arrays 
+	// e retornar esse $data atualizado ao final da função
+	 
+	// Dados do pedido do Woocommerce
 	$order_id = $data['metadata']['order_number'];
 	$order = new WC_Order( $order_id );
 	$items = $order->get_items();	
-	$order_total = $order->get_total('pagarme-split');
+	$order_total = $order->get_total('pagarme-split'); 
 	$total_left = $order_total;
 	
 	// Log to a WC logger
@@ -73,4 +77,6 @@
 	return $data;
 }
 
-add_action( 'wc_pagarme_checkout_data', 'wc_pagarme_custom_split_rules', 10, 1 );
+// Faz com que essa função seja chamada nas actions do pelo plugin da Pagar.me
+add_action( 'wc_pagarme_checkout_data', 'wc_pagarme_custom_split_rules', 10, 1 ); // action utilizada no Checkout Pagar.me (modal)
+add_action( 'wc_pagarme_transaction_data', 'wc_pagarme_custom_split_rules', 10, 1 ); // action utilizada no Checkout Transparente
