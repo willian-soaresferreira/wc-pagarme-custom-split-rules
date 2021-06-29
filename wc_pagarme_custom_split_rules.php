@@ -15,14 +15,14 @@
  * @param  array    $data  Transacion data.
  * @return array
  */
- function wc_pagarme_custom_split_rules( $data ) {
+ function wc_pagarme_custom_split_rules($data) {
 	// Ideia principal da função: receber os dados que serão enviados à API da Pagar.me ($data), 
 	// adicionar as split_rules, que é um array de arrays 
 	// e retornar esse $data atualizado ao final da função
 	 
 	// Dados do pedido do Woocommerce
 	$order_id = $data['metadata']['order_number'];
-	$order = new WC_Order( $order_id );
+	$order = new WC_Order($order_id);
 	$items = $order->get_items();	
 	$order_total = $order->get_total('pagarme-split'); 
 	$total_left = $order_total;
@@ -30,19 +30,21 @@
 	// Log to a WC logger
 	//$log = new WC_Logger();
  	//$log_entry = 'Teste split...' . implode(",", $items);	
-	//$log->add( 'woocommerce-pagarme-split', $log_entry );
+	//$log->add('woocommerce-pagarme-split', $log_entry);
 	
 	$split_rules = array();
 	
-	foreach ( $items as $item ) {
-
+	foreach ($items as $item) {
 		$product_id = $item['product_id'];
-		if ($product_id == 24 || $product_id == 21) { // Melhoria necessária: ler a configuração de cada produto
+		
+		// Melhoria necessária: ler a configuração de cada produto
+		if ($product_id == 24 || $product_id == 21) {
 			if ($product_id == 24) { 
 				$recipient_id = 're_ck69zvoif0cdg4a6eh69dup31'; 
 				$amount = $item['total'] * 0.25;
 			}
-			elseif ($product_id == 21) { 
+			
+			if ($product_id == 21) { 
 				$recipient_id = 're_ck69zvg5v0cd84a6elk9x2b3z'; 
 				$amount = $item['total'] * 0.25;
 			}
@@ -55,8 +57,7 @@
 				'liable' => true, 
 				'charge_processing_fee' => true
 			);
-		}
-		
+		}	
 	}
 	
 	// Recebedor principal
@@ -78,5 +79,5 @@
 }
 
 // Faz com que essa função seja chamada nas actions do pelo plugin da Pagar.me
-add_action( 'wc_pagarme_checkout_data', 'wc_pagarme_custom_split_rules', 10, 1 ); // action utilizada no Checkout Pagar.me (modal)
-add_action( 'wc_pagarme_transaction_data', 'wc_pagarme_custom_split_rules', 10, 1 ); // action utilizada no Checkout Transparente
+add_action('wc_pagarme_checkout_data', 'wc_pagarme_custom_split_rules', 10, 1); // action utilizada no Checkout Pagar.me (modal)
+add_action('wc_pagarme_transaction_data', 'wc_pagarme_custom_split_rules', 10, 1); // action utilizada no Checkout Transparente
